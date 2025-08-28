@@ -17,8 +17,8 @@ systemctl enable docker
 
 ### 2. Развертывание FreePBX
 ```bash
-# Клонируем/загружаем конфигурацию
-git clone <your-repo> pbx-setup
+# Клонируем конфигурацию
+git clone https://github.com/realrentbot/sip.git pbx-setup
 cd pbx-setup
 
 # Или создаем папку и копируем docker-compose.yml
@@ -34,7 +34,7 @@ docker-compose logs -f freepbx
 ```
 
 ### 3. Первая настройка
-1. Откройте в браузере: `http://IP_VPS:8080`
+1. Откройте в браузере: `http://37.27.240.184:8080`
 2. Дождитесь завершения установки (5-10 минут)
 3. Создайте админский аккаунт
 4. Войдите в FreePBX Admin Panel
@@ -58,11 +58,11 @@ docker-compose logs -f freepbx
 ### Настройки в MicroSIP:
 ```
 Account name: Мой PBX
-SIP server: IP_ВАШЕГО_VPS:5060
-SIP proxy: IP_ВАШЕГО_VPS:5060
+SIP server: 37.27.240.184:5060
+SIP proxy: 37.27.240.184:5060
 Username: 101 (номер из FreePBX)
 Password: пароль из FreePBX
-Domain: IP_ВАШЕГО_VPS
+Domain: 37.27.240.184
 ```
 
 ### Дополнительные настройки:

@@ -232,8 +232,8 @@ FREEPBX_SIP_PORT=5060
 RTP_START=10000
 RTP_END=20000
 
-# Server IP (will be set automatically)
-SERVER_IP=$(curl -s ifconfig.me)
+# Server IP
+SERVER_IP=37.27.240.184
 EOF
 
     log "Структура проекта создана в $INSTALL_DIR"
@@ -250,7 +250,7 @@ cd "$(dirname "$0")"
 echo "Запуск FreePBX..."
 docker-compose up -d
 echo "FreePBX запущен!"
-echo "Web интерфейс: http://$(curl -s ifconfig.me):8080"
+echo "Web интерфейс: http://37.27.240.184:8080"
 echo "Для первоначальной настройки подождите 3-5 минут"
 EOF
 
@@ -344,7 +344,7 @@ start_freepbx() {
 
 # Вывод информации о развертывании
 show_deployment_info() {
-    local SERVER_IP=$(curl -s ifconfig.me || echo "localhost")
+    local SERVER_IP="37.27.240.184"
     
     echo ""
     echo "=============================================="
@@ -357,17 +357,18 @@ show_deployment_info() {
     echo "   📞 SIP сервер: $SERVER_IP:5060"
     echo ""
     info "🔧 Управление:"
-    echo "   Запуск:    $INSTALL_DIR/start.sh"
-    echo "   Остановка: $INSTALL_DIR/stop.sh"
-    echo "   Логи:      $INSTALL_DIR/logs.sh"
-    echo "   Статус:    $INSTALL_DIR/status.sh"
-    echo "   Бэкап:     $INSTALL_DIR/backup.sh"
+    echo "   Запуск:      $INSTALL_DIR/start.sh"
+    echo "   Остановка:   $INSTALL_DIR/stop.sh"
+    echo "   Логи:        $INSTALL_DIR/logs.sh"
+    echo "   Статус:      $INSTALL_DIR/status.sh"
+    echo "   Бэкап:       $INSTALL_DIR/backup.sh"
+    echo "   Пользователи: ./deploy.sh users"
     echo ""
     info "⚠️  Первоначальная настройка:"
     echo "   1. Откройте http://$SERVER_IP:8080"
     echo "   2. Следуйте мастеру установки FreePBX"
     echo "   3. Создайте административную учетную запись"
-    echo "   4. Настройте SIP абонентов"
+    echo "   4. Создайте SIP пользователей: ./deploy.sh users"
     echo ""
     warn "Подождите 3-5 минут для полной инициализации системы"
     echo "=============================================="
@@ -422,8 +423,16 @@ case "${1:-}" in
     "backup")
         cd "$INSTALL_DIR" && ./backup.sh
         ;;
+    "users"|"create-users")
+        if [ -f "$SCRIPT_DIR/create-sip-users.sh" ]; then
+            log "Создание SIP пользователей..."
+            "$SCRIPT_DIR/create-sip-users.sh"
+        else
+            error "Скрипт create-sip-users.sh не найден в $SCRIPT_DIR"
+        fi
+        ;;
     *)
-        echo "Использование: $0 [install|start|stop|status|logs|update|backup]"
+        echo "Использование: $0 [install|start|stop|status|logs|update|backup|users]"
         echo ""
         echo "  install - Полная установка FreePBX (по умолчанию)"
         echo "  start   - Запуск FreePBX"
@@ -432,6 +441,7 @@ case "${1:-}" in
         echo "  logs    - Показать логи"
         echo "  update  - Обновить FreePBX"
         echo "  backup  - Создать бэкап"
+        echo "  users   - Создать SIP пользователей (1001-1005)"
         exit 1
         ;;
 esac
